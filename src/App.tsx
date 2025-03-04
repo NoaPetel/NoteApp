@@ -1,43 +1,91 @@
 import { useEffect, useState } from "react";
 import type { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
-import { useAuthenticator } from "@aws-amplify/ui-react";
+import { TextField, useAuthenticator } from "@aws-amplify/ui-react";
+import { Button, Modal, Input } from "antd";
 
 const client = generateClient<Schema>();
 
 function App() {
-  const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
+  const [notes, setNotes] = useState<Array<Schema["Note"]["type"]>>([]);
+  const [isModalOpen, setIsModalOpen] = useState<Boolean>(false);
+  const [title, setTitle] = useState<string>("");
+  const [content, setContent] = useState<string>("");
+  const [note, setNote] = useState<Schema["Note"]["type"]>();
   const { user, signOut } = useAuthenticator();
 
   useEffect(() => {
-    client.models.Todo.observeQuery().subscribe({
-      next: (data) => setTodos([...data.items]),
+    client.models.Note.observeQuery().subscribe({
+      next: (data) => setNotes([...data.items]),
     });
   }, []);
 
-  function createTodo() {
-    client.models.Todo.create({ content: window.prompt("Todo content") });
+  function showModalCreate() {
+    setIsModalOpen(true);
   }
 
-  function deleteTodo(id: string) {
-    client.models.Todo.delete({id})
+  function showModalUpdate(id: string) {
+    const note = notes.find((note) => note.id === id);
+    setNote(note);
+    if (note) {
+      setTitle(note.title);
+      setContent(note.content);
+      setIsModalOpen(true);
+    } else {
+      console.log("Note not found");
+    }
+  }
+
+  function handleCancel() {
+    setNote(undefined);
+    setIsModalOpen(false);
+  }
+
+  function handleCreate() {
+    if (note) {
+      client.models.Note.update({id: note.id, title, content })
+    } else {
+      client.models.Note.create({ title, content });
+    }
+    setTitle("");
+    setContent("");
+    setIsModalOpen(false);
+
   }
 
   return (
     <main>
-      <h1>{user?.signInDetails?.loginId}'s todos</h1>
-      <button onClick={createTodo}>+ new</button>
+      <h1>{user?.signInDetails?.loginId}'s Notes App</h1>
+      <Button onClick={showModalCreate}>+ new</Button>
+      <Modal
+        title="Note"
+        open={isModalOpen}
+        onOk={handleCreate}
+        onCancel={handleCancel}
+      >
+        <Input
+          id="title"
+          placeholder="Enter title"
+          value={title}
+          onChange={(x) => setTitle(x.target.value)}
+        />
+        <Input
+          id="content"
+          placeholder="Enter Content"
+          value={content}
+          onChange={(x) => setContent(x.target.value)}
+        />
+      </Modal>
       <ul>
-        {todos.map((todo) => (
-          <li onClick={ () => deleteTodo(todo.id)} key={todo.id}>{todo.content}</li>
+        {notes.map((note) => (
+          <li onClick={() => showModalUpdate(note.id)} key={note.id}>
+            {note.title}
+          </li>
         ))}
       </ul>
       <div>
-        🥳 App successfully hosted. Try creating a new todo.
+        🥳 App successfully hosted. Try creating a new note.
         <br />
-        <a href="https://docs.amplify.aws/react/start/quickstart/#make-frontend-updates">
-          Review next step of this tutorial.
-        </a>
       </div>
       <button onClick={signOut}> Sign out</button>
     </main>
