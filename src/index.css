@@ -53,6 +53,7 @@ ul {
 li {
   background-color: white;
   padding: 8px;
+  flex-grow: 9;
 }
 
 li:hover {
@@ -62,4 +63,11 @@ li:hover {
 a {
   font-weight: 800;
   text-decoration: none;
+}
+
+.list_wrapper {
+  display: flex;
+  flex: content;
+  flex-direction: row;
+  background-color: white;
 }

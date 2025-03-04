@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import type { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
-import { TextField, useAuthenticator } from "@aws-amplify/ui-react";
-import { Button, Modal, Input } from "antd";
+import { useAuthenticator } from "@aws-amplify/ui-react";
+import { Button, Modal, Input, Row, Flex } from "antd";
+import { CloseOutlined } from "@ant-design/icons";
 
 const client = generateClient<Schema>();
 
@@ -43,16 +44,20 @@ function App() {
 
   function handleCreate() {
     if (note) {
-      client.models.Note.update({id: note.id, title, content })
+      client.models.Note.update({ id: note.id, title, content });
     } else {
       client.models.Note.create({ title, content });
     }
     setTitle("");
     setContent("");
     setIsModalOpen(false);
-
   }
 
+  function deleteNote(id: string) {
+    if (id) {
+      client.models.Note.delete({ id: id });
+    }
+  }
   return (
     <main>
       <h1>{user?.signInDetails?.loginId}'s Notes App</h1>
@@ -78,9 +83,12 @@ function App() {
       </Modal>
       <ul>
         {notes.map((note) => (
-          <li onClick={() => showModalUpdate(note.id)} key={note.id}>
-            {note.title}
-          </li>
+          <div className="list_wrapper">
+            <li onClick={() => showModalUpdate(note.id)} key={note.id}>
+              {note.title}
+            </li>
+            <CloseOutlined style={{flexGrow:"1"}} />
+          </div>
         ))}
       </ul>
       <div>
