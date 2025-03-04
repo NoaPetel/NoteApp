@@ -12,6 +12,12 @@ const schema = a.schema({
       content: a.string(),
     })
     .authorization((allow) => [allow.publicApiKey()]),
+  NoaTable: a
+  .model({
+    name: a.string(),
+  })
+  .authorization((allow) => [allow.publicApiKey()]),
+
 });
 
 export type Schema = ClientSchema<typeof schema>;
