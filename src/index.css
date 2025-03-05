@@ -80,6 +80,6 @@ a {
   flex-grow: 1;
 }
 
-.small_button {
-
+.tag_list_element {
+  background-color: white;
 }

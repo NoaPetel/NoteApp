@@ -9,9 +9,12 @@ const client = generateClient<Schema>();
 
 function App() {
   const [notes, setNotes] = useState<Array<Schema["Note"]["type"]>>([]);
+  const [tags, setTags] = useState<Array<Schema["Tag"]["type"]>>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [title, setTitle] = useState<string>("");
   const [content, setContent] = useState<string>("");
+  const [tagTitle, setTagTitle] = useState<string>("");
+ 
   const [note, setNote] = useState<Schema["Note"]["type"]>();
   const [isFiltered, setIsFiltered] = useState<boolean>(false);
   
@@ -20,6 +23,10 @@ function App() {
   useEffect(() => {
     client.models.Note.observeQuery().subscribe({
       next: (data) => setNotes([...data.items]),
+    });
+    client.models.Tag.observeQuery().subscribe({
+      next: (data) => setTags([...data.items]),
+      error: (error) =>  console.error("Error fetching tags", error),
     });
   }, []);
 
@@ -69,9 +76,28 @@ function App() {
     setIsFiltered(!isFiltered)
   }
 
+  function createTag(){
+    client.models.Tag.create({ title: tagTitle })
+  }
+
   return (
     <main>
       <h1>{user?.signInDetails?.loginId}'s Notes App</h1>
+      
+      <div className="tag_div">
+        <Input 
+        id="tagTitle"
+        placeholder="New tag"
+        value={tagTitle}
+        onChange={ x => setTagTitle(x.target.value) } 
+        />
+        <Button onClick={createTag}> Create Tag </Button>
+        <ul>
+          {tags.map( tag => 
+          <li className="tag_list_element" key={tag.id}> {tag.title} </li>
+          )}
+        </ul>
+      </div>
       <Button onClick={showModalCreate}>+ new</Button>
       <Button className="small_button" onClick={applyFilters}> Show favorite </Button>
       <Modal
