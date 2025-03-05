@@ -2,14 +2,14 @@ import { useEffect, useState } from "react";
 import type { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
 import { useAuthenticator } from "@aws-amplify/ui-react";
-import { Button, Modal, Input, Row, Flex } from "antd";
+import { Button, Modal, Input } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 
 const client = generateClient<Schema>();
 
 function App() {
   const [notes, setNotes] = useState<Array<Schema["Note"]["type"]>>([]);
-  const [isModalOpen, setIsModalOpen] = useState<Boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [title, setTitle] = useState<string>("");
   const [content, setContent] = useState<string>("");
   const [note, setNote] = useState<Schema["Note"]["type"]>();
@@ -29,8 +29,8 @@ function App() {
     const note = notes.find((note) => note.id === id);
     setNote(note);
     if (note) {
-      setTitle(note.title);
-      setContent(note.content);
+      setTitle(note.title ? note.title: "");
+      setContent(note.content ? note.content: "");
       setIsModalOpen(true);
     } else {
       console.log("Note not found");
@@ -58,6 +58,7 @@ function App() {
       client.models.Note.delete({ id: id });
     }
   }
+
   return (
     <main>
       <h1>{user?.signInDetails?.loginId}'s Notes App</h1>
@@ -87,7 +88,9 @@ function App() {
             <li onClick={() => showModalUpdate(note.id)} key={note.id}>
               {note.title}
             </li>
-            <CloseOutlined style={{flexGrow:"1"}} />
+            <div className="list_element_2">
+              <CloseOutlined onClick={ () => deleteNote(note.id)} />
+            </div>
           </div>
         ))}
       </ul>
