@@ -13,7 +13,7 @@ const schema = a.schema({
       title: a.string(),
       content: a.string(),
       favorite: a.boolean(),
-      tag: a.hasOne('Tag', 'noteId'),
+      noteTags: a.hasMany('NoteTag', 'noteId'),
     })
     .authorization((allow) => [allow.owner()]),
 
@@ -21,10 +21,19 @@ const schema = a.schema({
     .model({
       id: a.id().required(),
       title: a.string(),
-      noteId: a.id(),
-      note: a.belongsTo('Note', 'noteId'),
+      noteTags: a.hasMany('NoteTag', 'tagId'),
     })
     .authorization((allow) => [allow.owner()]),
+
+    NoteTag: a
+    .model({
+
+      noteId: a.id(),
+      tagId: a.id(),
+      note: a.belongsTo('Note', 'noteId'),
+      tag: a.belongsTo('Tag', 'tagId'),
+    })
+    .authorization((allow) => [allow.owner()])
 });
 
 export type Schema = ClientSchema<typeof schema>;
