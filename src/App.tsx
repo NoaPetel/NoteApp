@@ -3,7 +3,7 @@ import type { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import { Button, Modal, Input } from "antd";
-import { CloseOutlined } from "@ant-design/icons";
+import { CloseOutlined, HeartFilled, HeartOutlined } from "@ant-design/icons";
 
 const client = generateClient<Schema>();
 
@@ -13,6 +13,8 @@ function App() {
   const [title, setTitle] = useState<string>("");
   const [content, setContent] = useState<string>("");
   const [note, setNote] = useState<Schema["Note"]["type"]>();
+  const [isFiltered, setIsFiltered] = useState<boolean>(false);
+  
   const { user, signOut } = useAuthenticator();
 
   useEffect(() => {
@@ -29,7 +31,7 @@ function App() {
     const note = notes.find((note) => note.id === id);
     setNote(note);
     if (note) {
-      setTitle(note.title ? note.title: "");
+      setTitle(note?.title || "");
       setContent(note.content ? note.content: "");
       setIsModalOpen(true);
     } else {
@@ -59,15 +61,31 @@ function App() {
     }
   }
 
+  function addToFavorite() {
+    client.models.Note.update({id: note.id, favorite: !note?.favorite})
+  }
+
+  function applyFilters() {
+    setIsFiltered(!isFiltered)
+  }
+
   return (
     <main>
       <h1>{user?.signInDetails?.loginId}'s Notes App</h1>
       <Button onClick={showModalCreate}>+ new</Button>
+      <Button className="small_button" onClick={applyFilters}> Show favorite </Button>
       <Modal
         title="Note"
         open={isModalOpen}
         onOk={handleCreate}
         onCancel={handleCancel}
+        footer={(_, { OkBtn, CancelBtn }) => (
+          <>
+            {note && <Button color="default" variant="text" onClick={addToFavorite}> Favorite </Button>}
+            <CancelBtn />
+            <OkBtn />
+          </>
+        )}
       >
         <Input
           id="title"
@@ -83,13 +101,18 @@ function App() {
         />
       </Modal>
       <ul>
-        {notes.map((note) => (
+        {notes
+        .filter(note => !isFiltered || note.favorite)
+        .map((note) => (
           <div className="list_wrapper">
             <li onClick={() => showModalUpdate(note.id)} key={note.id}>
               {note.title}
             </li>
             <div className="list_element_2">
               <CloseOutlined onClick={ () => deleteNote(note.id)} />
+            </div>
+            <div className="list_element_3">
+              {note.favorite && <HeartFilled color="red" />}
             </div>
           </div>
         ))}

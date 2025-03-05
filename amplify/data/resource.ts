@@ -11,6 +11,7 @@ const schema = a.schema({
     .model({
       title: a.string(),
       content: a.string(),
+      favorite: a.boolean()
     })
     .authorization((allow) => [allow.owner()]),
 });
