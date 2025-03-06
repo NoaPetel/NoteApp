@@ -2,26 +2,12 @@ import { useEffect, useState } from "react";
 import type { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
 import { useAuthenticator } from "@aws-amplify/ui-react";
-import { Button, Modal, Input } from "antd";
+import { Button, Modal, Input, Layout, Menu, theme } from "antd";
 import { CloseOutlined, HeartFilled, PlusOutlined } from "@ant-design/icons";
 
+const { Header, Sider, Footer } = Layout;
+
 const client = generateClient<Schema>();
-
-type Note = {
-  id: string;
-  title: string;
-  content: string;
-  favorite: boolean;
-};
-
-type Tag = {
-  id: string;
-  title: string;
-};
-
-type MergedNotes = Note & { tags: Tag[] };
-
-type MergedTags = Tag & { notes: Note[] };
 
 function App() {
   const [notes, setNotes] = useState<Array<Schema["Note"]["type"]>>([]);
@@ -29,9 +15,10 @@ function App() {
   const [noteTags, setNoteTags] = useState<Array<Schema["NoteTag"]["type"]>>(
     []
   );
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [modalSelectedTags, setModalSelectedTags] = useState<string[]>([]);
-  const [mergedNotes, setMergedNotes] = useState<Array<MergedNotes>>([]);
-  const [mergedTags, setMergedTags] = useState<Array<MergedTags>>([]);
+
+  const [collapsed, setCollapsed] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isModalTagsOpen, setIsModalTagsOpen] = useState<boolean>(false);
   const [title, setTitle] = useState<string>("");
@@ -39,6 +26,9 @@ function App() {
   const [tagTitle, setTagTitle] = useState<string>("");
   const [note, setNote] = useState<Schema["Note"]["type"]>();
   const [isFiltered, setIsFiltered] = useState<boolean>(false);
+  const {
+    token: { colorBgContainer, borderRadiusLG },
+  } = theme.useToken();
 
   const { user, signOut } = useAuthenticator();
 
@@ -114,7 +104,9 @@ function App() {
   }
 
   function addToFavorite() {
-    client.models.Note.update({ id: note.id, favorite: !note?.favorite });
+    if (note) {
+      client.models.Note.update({ id: note.id, favorite: !note?.favorite });
+    }
   }
 
   function applyFilters() {
@@ -147,114 +139,168 @@ function App() {
   }
 
   function handleModalSelectTag(tagId: string) {
-    console.log("Tags in modal clicked");
-
     setModalSelectedTags((prevTags) =>
       prevTags.includes(tagId)
         ? prevTags.filter((id) => id !== tagId)
         : [...prevTags, tagId]
     );
-    console.log(modalSelectedTags);
+  }
+
+  function handleSelectedTag(tagId: string) {
+    setSelectedTags((prevTags) =>
+      prevTags.includes(tagId)
+        ? prevTags.filter((id) => id !== tagId)
+        : [...prevTags, tagId]
+    );
+  }
+
+  function applyNotesFilter(noteId: string) {
+    const tagIds = noteTags
+      .filter((nt) => nt.noteId === noteId)
+      .map((nt) => nt.tagId);
+
+    return selectedTags.every((id) => tagIds.includes(id || ""));
   }
 
   return (
-    <main>
-      <h1>{user?.signInDetails?.loginId}'s Notes App</h1>
-
-      <div className="tag_div">
-        <Input
-          id="tagTitle"
-          placeholder="New tag"
-          value={tagTitle}
-          onChange={(x) => setTagTitle(x.target.value)}
-        />
-        <Button onClick={createTag}> Create Tag </Button>
-        <ul>
-          {tags.map((tag) => (
-            <li className="tag_list_element" key={tag.id}>
-              {tag.title}
-            </li>
-          ))}
-        </ul>
-      </div>
-      <Button onClick={showModalCreate}>+ new</Button>
-      <Button className="small_button" onClick={applyFilters}>
-        {" "}
-        Show favorite{" "}
-      </Button>
-      <Modal
-        title="Note"
-        open={isModalOpen}
-        onOk={handleCreate}
-        onCancel={handleCancel}
-        footer={(_, { OkBtn, CancelBtn }) => (
-          <>
-            {note && (
-              <Button color="default" variant="text" onClick={addToFavorite}>
-                Favorite
-              </Button>
-            )}
-            <CancelBtn />
-            <OkBtn />
-          </>
-        )}
+    <Layout className="main_layout">
+      <Sider
+        className="sidebar"
+        trigger={null}
+        collapsible
+        collapsed={collapsed}
       >
-        <Input
-          id="title"
-          placeholder="Enter title"
-          value={title}
-          onChange={(x) => setTitle(x.target.value)}
-        />
-        <Input
-          id="content"
-          placeholder="Enter Content"
-          value={content}
-          onChange={(x) => setContent(x.target.value)}
-        />
-      </Modal>
-      <ul>
-        {notes
-          .filter((note) => !isFiltered || note.favorite)
-          .map((note) => (
-            <div className="list_wrapper" key={note.id}>
-              <li onClick={() => showModalUpdate(note.id)}>{note.title}</li>
-              <div className="list_element_2">
-                <CloseOutlined onClick={() => deleteNote(note.id)} />
-              </div>
-              <div className="list_element_3">
-                {note.favorite && <HeartFilled color="red" />}
-              </div>
-              <div className="list_element_3">
-                <PlusOutlined onClick={() => showModalTags(note.id)} />
-                <Modal
-                  title="tags"
-                  open={isModalTagsOpen}
-                  onOk={handleAddTags}
-                  onCancel={handleCancel}
-                >
-                  {tags.map((tag) => (
-                    <Button
-                      color="red"
-                      variant={
-                        modalSelectedTags.includes(tag.id) ? "solid" : "text"
-                      }
-                      key={tag.id}
-                      onClick={() => handleModalSelectTag(tag.id)}
-                    >
-                      {tag.title}
-                    </Button>
-                  ))}
-                </Modal>
-              </div>
+        <Menu
+          mode="inline"
+          selectedKeys={selectedTags}
+          items={tags.map((tag) => ({
+            key: tag.id, // Unique key for each menu item
+            label: tag.title,
+            // style: {
+            //   backgroundColor: selectedTags.includes(tag.id) ? "red" : "white",
+            // },
+            onClick: () => handleSelectedTag(tag.id), // Handle selection
+          }))}
+        >
+          <main>
+            <div className="tag_div">
+              <Input
+                id="tagTitle"
+                placeholder="New tag"
+                value={tagTitle}
+                onChange={(x) => setTagTitle(x.target.value)}
+              />
+              <Button onClick={createTag}> Create Tag </Button>
+              <ul>
+                {tags.map((tag) => (
+                  <li
+                    className="tag_list_element"
+                    style={{
+                      backgroundColor: selectedTags.includes(tag.id)
+                        ? "red"
+                        : "white",
+                    }}
+                    key={tag.id}
+                    onClick={() => handleSelectedTag(tag.id)}
+                  >
+                    {tag.title}
+                  </li>
+                ))}
+              </ul>
             </div>
-          ))}
-      </ul>
-      <div>
-        🥳 App successfully hosted. Try creating a new note.
-        <br />
-      </div>
-      <button onClick={signOut}> Sign out</button>
-    </main>
+            <Button onClick={showModalCreate}>+ new</Button>
+            <Button className="small_button" onClick={applyFilters}>
+              Show favorite
+            </Button>
+            <Modal
+              title="Note"
+              open={isModalOpen}
+              onOk={handleCreate}
+              onCancel={handleCancel}
+              footer={(_, { OkBtn, CancelBtn }) => (
+                <>
+                  {note && (
+                    <Button
+                      color="default"
+                      variant="text"
+                      onClick={addToFavorite}
+                    >
+                      Favorite
+                    </Button>
+                  )}
+                  <CancelBtn />
+                  <OkBtn />
+                </>
+              )}
+            >
+              <Input
+                id="title"
+                placeholder="Enter title"
+                value={title}
+                onChange={(x) => setTitle(x.target.value)}
+              />
+              <Input
+                id="content"
+                placeholder="Enter Content"
+                value={content}
+                onChange={(x) => setContent(x.target.value)}
+              />
+            </Modal>
+            <ul>
+              {notes
+                .filter((note) => applyNotesFilter(note.id))
+                .map((note) => (
+                  <div className="list_wrapper" key={note.id}>
+                    <li onClick={() => showModalUpdate(note.id)}>
+                      {note.title}
+                    </li>
+                    <div className="list_element_2">
+                      <CloseOutlined onClick={() => deleteNote(note.id)} />
+                    </div>
+                    <div className="list_element_3">
+                      {note.favorite && <HeartFilled color="red" />}
+                    </div>
+                    <div className="list_element_3">
+                      <PlusOutlined onClick={() => showModalTags(note.id)} />
+                      <Modal
+                        title="tags"
+                        open={isModalTagsOpen}
+                        onOk={handleAddTags}
+                        onCancel={handleCancel}
+                      >
+                        {tags.map((tag) => (
+                          <Button
+                            color="red"
+                            variant={
+                              modalSelectedTags.includes(tag.id)
+                                ? "solid"
+                                : "text"
+                            }
+                            key={tag.id}
+                            onClick={() => handleModalSelectTag(tag.id)}
+                          >
+                            {tag.title}
+                          </Button>
+                        ))}
+                      </Modal>
+                    </div>
+                  </div>
+                ))}
+            </ul>
+            <div>
+              🥳 App successfully hosted. Try creating a new note.
+              <br />
+            </div>
+          </main>
+        </Menu>
+      </Sider>
+      <Layout>
+        <Header>
+          <h1>{user?.signInDetails?.loginId}'s Notes App</h1>
+          <button onClick={signOut}> Sign out</button>
+        </Header>
+      </Layout>
+    </Layout>
   );
 }
 
