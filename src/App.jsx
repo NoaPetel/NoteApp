@@ -219,6 +219,8 @@ const App = () => {
     if (note) {
       setSliderNotesItems((prev) => prev?.filter((n) => n?.key !== note.id));
       deleteNote(note.id);
+      setTitle("");
+      setContent("");
     }
   }
 
@@ -237,7 +239,6 @@ const App = () => {
     if (modalSelectedTags.length > 0 && note) {
       modalSelectedTags.forEach((t) => {
         if (!noteTags.find((nt) => nt.tagId === t && nt.noteId == note.id)) {
-          console.log("create", t);
           createNoteTag(note.id, t);
         }
       });
@@ -265,23 +266,34 @@ const App = () => {
 
   if (isLoading) {
     return (
-      <Flex style={{width:"98vw", heigh:"100vh"}} align="center" justify="center">
+      <Flex
+        style={{ width: "98vw", heigh: "100vh" }}
+        align="center"
+        justify="center"
+      >
         <Spin size="large" />
       </Flex>
     );
   } else {
     return (
-      <Layout style={{ height: "100vh", width: "98vw" }}>
+      <Layout
+        style={{ height: "100vh", width: "100vw", border: "2px solid green" }}
+      >
         <Sider
-          className="main_slider"
-          style={{ height: "100%", overflow: "hidden" }}
-          trigger={null}
+          style={{
+            height: "100%",
+            backgroundColor: "white",
+            borderRight: "2px solid #d1d1d1",
+          }}
         >
           <div className="demo-logo-vertical" />
           <Menu
             className="main_slider"
-            style={{ overflow: "hidder", overflowY: "auto" }}
-            theme="dark"
+            style={{
+              overflow: "hidder",
+              overflowY: "auto",
+            }}
+            theme="light"
             mode="inline"
             defaultSelectedKeys={["1"]}
             items={items1}
@@ -301,11 +313,17 @@ const App = () => {
             />
           </Modal>
         </Sider>
-        <Sider trigger={null} collapsible collapsed={collapsed}>
+        <Sider
+          style={{
+            backgroundColor: "white",
+            height: "100%",
+          }}
+        >
           <div className="demo-logo-vertical" />
           <Menu
-            theme="dark"
+            theme="light"
             mode="inline"
+            style={{ backgroundColor: "white", height: "100%" }}
             defaultSelectedKeys={["1"]}
             items={sliderNotesItems}
             onClick={handleNoteClick}
@@ -324,97 +342,108 @@ const App = () => {
             onChange={(x) => setTitle(x.target.value)}
           />
         </Modal>
-        <Layout>
-          <Header
-            style={{
-              padding: "15px",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "120px",
-              overflow: "hidden",
-            }}
-          >
-            <Flex
-              vertical={true}
-              wrap="wrap"
-              gap="small"
-              style={{ flexGrow: 2, width: "100%" }}
+        {note ? (
+          <Layout>
+            <Header
+              style={{
+                backgroundColor: "white",
+                padding: "15px",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "120px",
+                overflow: "hidden",
+              }}
             >
-              <Input
-                id="title"
-                placeholder="Enter title"
-                value={title}
-                onChange={(x) => setTitle(x.target.value)}
-              />
-              <div
-                style={{
-                  display: "flex",
-                  gap: "8px",
-                  maxHeight: "100px",
-                  overflowX: "auto",
-                  padding: "5px",
-                }}
+              <Flex
+                vertical={true}
+                wrap="wrap"
+                gap="small"
+                style={{ flexGrow: 2, width: "100%" }}
               >
-                <PlusOutlined onClick={handleAddTagToNote} />
-                {tags
-                  .filter((tag) => applyFiltersOnTag(tag))
-                  .map((tag) => (
+                <Input
+                  id="title"
+                  placeholder="Enter title"
+                  value={title}
+                  onChange={(x) => setTitle(x.target.value)}
+                />
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "8px",
+                    maxHeight: "100px",
+                    overflowX: "auto",
+                    padding: "5px",
+                  }}
+                >
+                  <PlusOutlined onClick={handleAddTagToNote} />
+                  {tags
+                    .filter((tag) => applyFiltersOnTag(tag))
+                    .map((tag) => (
+                      <Button
+                        style={{ minWidth: "70px", width: "50px" }}
+                        key={tag.id}
+                      >
+                        {tag.title}
+                      </Button>
+                    ))}
+                </div>
+                <Modal
+                  title="tags"
+                  open={IsModalAddTagToNoteOpen}
+                  onOk={handleAddTags}
+                  onCancel={handleCancel}
+                >
+                  {tags.map((tag) => (
                     <Button
-                      style={{ minWidth: "70px", width: "50px" }}
+                      color="red"
+                      variant={
+                        modalSelectedTags.includes(tag.id) ? "solid" : "text"
+                      }
                       key={tag.id}
+                      onClick={() => handleModalSelectTag(tag.id)}
                     >
                       {tag.title}
                     </Button>
                   ))}
-              </div>
-              <Modal
-                title="tags"
-                open={IsModalAddTagToNoteOpen}
-                onOk={handleAddTags}
-                onCancel={handleCancel}
-              >
-                {tags.map((tag) => (
+                </Modal>
+              </Flex>
+            </Header>
+
+            <Content
+              className="content"
+              style={{
+                height: "calc(100vh - 120px)",
+                padding: 24,
+                borderRadius: borderRadiusLG,
+                overflow: "hidden",
+              }}
+            >
+              <Flex style={{ height: "100%" }} gap="5px" vertical={true}>
+                <Input.TextArea
+                  id="content"
+                  placeholder="Enter Content"
+                  value={content}
+                  style={{ height: "100%" }}
+                  onChange={(x) => setContent(x.target.value)}
+                />
+                <Flex gap="5px" justify="end">
                   <Button
-                    color="red"
-                    variant={
-                      modalSelectedTags.includes(tag.id) ? "solid" : "text"
-                    }
-                    key={tag.id}
-                    onClick={() => handleModalSelectTag(tag.id)}
+                    color="danger"
+                    variant="solid"
+                    onClick={handleDeleteNote}
                   >
-                    {tag.title}
+                    {" "}
+                    Delete{" "}
                   </Button>
-                ))}
-              </Modal>
-            </Flex>
-          </Header>
-          <Content
-            className="content"
-            style={{
-              height: "calc(100vh - 120px)",
-              margin: "24px 16px",
-              padding: 24,
-              borderRadius: borderRadiusLG,
-              overflow: "hidden",
-            }}
-          >
-            <Input.TextArea
-              id="content"
-              placeholder="Enter Content"
-              value={content}
-              style={{ height: "100%" }}
-              onChange={(x) => setContent(x.target.value)}
-            />
-            <Flex>
-              <Button onClick={handleDeleteNote}> Delete </Button>
-              <Button className="primary"> Save </Button>
-            </Flex>
-          </Content>
-        </Layout>
+                  <Button type="primary"> Save </Button>
+                </Flex>
+              </Flex>
+            </Content>
+          </Layout>
+        ) : null}
       </Layout>
-      
     );
   }
 };
