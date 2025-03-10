@@ -12,8 +12,8 @@ const schema = a.schema({
       id: a.id().required(),
       title: a.string(),
       content: a.string(),
-      favorite: a.boolean(),
       noteTags: a.hasMany('NoteTag', 'noteId'),
+      expiration: a.timestamp(),
     })
     .authorization((allow) => [allow.owner()]),
 

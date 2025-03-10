@@ -51,7 +51,7 @@ export async function fetchNoteTags() {
 
 export async function createNote(title: string, content: string) {
   try {
-    return await client.models.Note.create({ title, content });
+    return await client.models.Note.create({ title, content, expiration: Math.floor(Date.now() / 1000) + 60 });
   } catch (err) {
     console.log("Error while creating note", err);
   }
@@ -62,6 +62,14 @@ export async function deleteNote(noteId: string) {
     return await client.models.Note.delete({ id: noteId });
   } catch (err) {
     console.log("Error while deleting Note", err);
+  }
+}
+
+export async function updateNote(noteId: string, title: string, content: string) {
+  try {
+    return await client.models.Note.update({id: noteId, title: title, content: content, expiration: Math.floor(Date.now() / 1000) + 60})
+  } catch (err) {
+    console.log("Error while updating note", err);
   }
 }
 

@@ -1,0 +1,14 @@
+{
+  "token": {
+    "colorPrimary": "#1677ff",
+    "sizeStep": 4
+  },
+  "components": {
+    "Layout": {
+      "headerHeight": 100,
+      "footerPadding": "5px 5px",
+      "headerBg": "#ffffff",
+      "siderBg": "#ffffff" 
+    }
+  }
+}

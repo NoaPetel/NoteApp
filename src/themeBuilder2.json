@@ -1,0 +1,35 @@
+{
+  "token": {
+    "colorPrimary": "#4096ff",  
+    "sizeStep": 4,
+    "colorBgBase": "#121212",  
+    "colorTextBase": "#e0e0e0",  
+    "colorBorder": "#333333",  
+    "colorBgElevated": "#1e1e1e"  
+  },
+  "components": {
+    "Layout": {
+      "headerHeight": 100,
+      "footerPadding": "10px 10px",  
+      "headerBg": "#1a1a1a",  
+      "siderBg": "#1a1a1a",  
+      "colorText": "#e0e0e0"  
+    },
+    "Button": {
+      "colorBg": "#262626",  
+      "colorBgHover": "#333333",  
+      "colorText": "#ffffff"  
+    },
+    "Input": {
+      "colorBg": "#262626",  
+      "colorText": "#ffffff",  
+      "colorBorder": "#444444",  
+      "colorBorderHover": "#4096ff"  
+    },
+    "Card": {
+      "colorBg": "#1e1e1e",  
+      "colorBorder": "#333333",  
+      "colorShadow": "rgba(0, 0, 0, 0.6)"  
+    }
+  }
+}

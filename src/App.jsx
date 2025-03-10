@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import {
   AlignCenterOutlined,
   TagOutlined,
-  CloseOutlined,
-  HeartFilled,
   PlusOutlined,
+  MoonOutlined,
+  SunOutlined,
 } from "@ant-design/icons";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import {
@@ -13,9 +13,8 @@ import {
   Input,
   Layout,
   Menu,
-  theme,
   ConfigProvider,
-  Tag,
+  theme,
   Flex,
   Spin,
 } from "antd";
@@ -31,15 +30,12 @@ import {
   fetchNotes,
   fetchTags,
   fetchNoteTags,
+  updateNote
 } from "./data";
-
-const { Header, Sider, Content, Footer } = Layout;
+import themeA from "./themeBuilder.json";
+import themeB from "./themeBuilder2.json";
 
 const App = () => {
-  const {
-    token: { colorBgContainer, borderRadiusLG },
-  } = theme.useToken();
-
   const [notes, setNotes] = useState([]);
   const [tags, setTags] = useState([]);
   const [noteTags, setNoteTags] = useState([]);
@@ -48,8 +44,8 @@ const App = () => {
   const [selectedTags, setSelectedTags] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const [isLightTheme, setIsLightTheme] = useState(true);
   const [modalSelectedTags, setModalSelectedTags] = useState([]);
-  const [collapsed, setCollapsed] = useState(false);
   const [IsModalAddTagToNoteOpen, setIsModalAddTagToNoteOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalTagsOpen, setIsModalTagsOpen] = useState(false);
@@ -57,7 +53,11 @@ const App = () => {
   const [content, setContent] = useState("");
   const [tagTitle, setTagTitle] = useState("");
   const [note, setNote] = useState();
-  const [isFiltered, setIsFiltered] = useState(false);
+
+  const [currentTheme, setCurrentTheme] = useState(themeA);
+
+  const { Header, Sider, Content, Footer } = Layout;
+  const { signOut } = useAuthenticator();
 
   useEffect(() => {
     async function fetchInitialData() {
@@ -114,13 +114,6 @@ const App = () => {
     },
   ];
 
-  function applyNotesFilter(noteId) {
-    const tagIds = noteTags
-      .filter((nt) => nt.noteId === noteId)
-      .map((nt) => nt.tagId);
-    return selectedTags.every((id) => tagIds.includes(id || ""));
-  }
-
   const handleNoteClick = (item) => {
     if (item.key === "ADD") {
       setIsModalOpen(true);
@@ -167,7 +160,6 @@ const App = () => {
   };
 
   function handleCancel() {
-    setNote(undefined);
     setIsModalOpen(false);
     setIsModalAddTagToNoteOpen(false);
     setIsModalTagsOpen(false);
@@ -186,12 +178,12 @@ const App = () => {
             ...prevValue,
           ]);
 
-          setTitle("");
+          setTitle(title);
           setContent("");
           setIsModalOpen(false);
         }
       })
-      .catch((err) => console.error("sError while creating the notes", err));
+      .catch((err) => console.error("Error while creating the notes", err));
   }
 
   function handleCreateTag() {
@@ -264,6 +256,20 @@ const App = () => {
     );
   }
 
+  function handleTheme() {
+    // console.log("Light", isLightTheme);
+    // setIsLightTheme((prev) => !prev);
+    setCurrentTheme((prev) => (prev === themeA ? themeB : themeA));
+  }
+
+  function handleSaveNote(noteId){
+    try{
+      updateNote(noteId, title, content);
+    } catch(err) {
+      console.log("Error while updating note", err);
+    }
+  }
+
   if (isLoading) {
     return (
       <Flex
@@ -276,174 +282,180 @@ const App = () => {
     );
   } else {
     return (
-      <Layout
-        style={{ height: "100vh", width: "100vw", border: "2px solid green" }}
-      >
-        <Sider
-          style={{
-            height: "100%",
-            backgroundColor: "white",
-            borderRight: "2px solid #d1d1d1",
-          }}
-        >
-          <div className="demo-logo-vertical" />
-          <Menu
-            className="main_slider"
-            style={{
-              overflow: "hidder",
-              overflowY: "auto",
-            }}
-            theme="light"
-            mode="inline"
-            defaultSelectedKeys={["1"]}
-            items={items1}
-            onClick={handleMenuClick}
-          />
-          <Modal
-            title="Tag"
-            open={isModalTagsOpen}
-            onOk={handleCreateTag}
-            onCancel={handleCancel}
-          >
-            <Input
-              id="title"
-              placeholder="Enter title"
-              value={tagTitle}
-              onChange={(x) => setTagTitle(x.target.value)}
-            />
-          </Modal>
-        </Sider>
-        <Sider
-          style={{
-            backgroundColor: "white",
-            height: "100%",
-          }}
-        >
-          <div className="demo-logo-vertical" />
-          <Menu
-            theme="light"
-            mode="inline"
-            style={{ backgroundColor: "white", height: "100%" }}
-            defaultSelectedKeys={["1"]}
-            items={sliderNotesItems}
-            onClick={handleNoteClick}
-          />
-        </Sider>
-        <Modal
-          title="Note"
-          open={isModalOpen}
-          onOk={handleCreateNote}
-          onCancel={handleCancel}
-        >
-          <Input
-            id="title"
-            placeholder="Enter title"
-            value={title}
-            onChange={(x) => setTitle(x.target.value)}
-          />
-        </Modal>
-        {note ? (
+      <ConfigProvider theme={currentTheme}>
+        <Layout style={{ height: "100vh", width: "100vw" }}>
           <Layout>
-            <Header
+            <Sider
               style={{
-                backgroundColor: "white",
-                padding: "15px",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-                height: "120px",
+                height: "100%",
+                borderRight: "2px solid #d1d1d1",
                 overflow: "hidden",
+                overflowY: "auto",
+                scrollbarWidth: "thin",
               }}
             >
-              <Flex
-                vertical={true}
-                wrap="wrap"
-                gap="small"
-                style={{ flexGrow: 2, width: "100%" }}
+              <Menu
+                className="main_slider"
+                style={{
+                  overflow: "hidden",
+                  overflowY: "auto",
+                }}
+                mode="inline"
+                defaultSelectedKeys={["1"]}
+                items={items1}
+                onClick={handleMenuClick}
+              />
+              <Modal
+                title="Tag"
+                open={isModalTagsOpen}
+                onOk={handleCreateTag}
+                onCancel={handleCancel}
               >
                 <Input
                   id="title"
                   placeholder="Enter title"
-                  value={title}
-                  onChange={(x) => setTitle(x.target.value)}
+                  value={tagTitle}
+                  onChange={(x) => setTagTitle(x.target.value)}
                 />
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "8px",
-                    maxHeight: "100px",
-                    overflowX: "auto",
-                    padding: "5px",
-                  }}
-                >
-                  <PlusOutlined onClick={handleAddTagToNote} />
-                  {tags
-                    .filter((tag) => applyFiltersOnTag(tag))
-                    .map((tag) => (
-                      <Button
-                        style={{ minWidth: "70px", width: "50px" }}
-                        key={tag.id}
-                      >
-                        {tag.title}
-                      </Button>
-                    ))}
-                </div>
-                <Modal
-                  title="tags"
-                  open={IsModalAddTagToNoteOpen}
-                  onOk={handleAddTags}
-                  onCancel={handleCancel}
-                >
-                  {tags.map((tag) => (
-                    <Button
-                      color="red"
-                      variant={
-                        modalSelectedTags.includes(tag.id) ? "solid" : "text"
-                      }
-                      key={tag.id}
-                      onClick={() => handleModalSelectTag(tag.id)}
-                    >
-                      {tag.title}
-                    </Button>
-                  ))}
-                </Modal>
-              </Flex>
-            </Header>
-
-            <Content
-              className="content"
+              </Modal>
+            </Sider>
+            <Sider
               style={{
-                height: "calc(100vh - 120px)",
-                padding: 24,
-                borderRadius: borderRadiusLG,
-                overflow: "hidden",
+                height: "100%",
               }}
             >
-              <Flex style={{ height: "100%" }} gap="5px" vertical={true}>
-                <Input.TextArea
-                  id="content"
-                  placeholder="Enter Content"
-                  value={content}
-                  style={{ height: "100%" }}
-                  onChange={(x) => setContent(x.target.value)}
-                />
-                <Flex gap="5px" justify="end">
-                  <Button
-                    color="danger"
-                    variant="solid"
-                    onClick={handleDeleteNote}
+              <Menu
+                mode="inline"
+                style={{ height: "100%" }}
+                defaultSelectedKeys={["1"]}
+                items={sliderNotesItems}
+                onClick={handleNoteClick}
+              />
+            </Sider>
+            <Modal
+              title="Note"
+              open={isModalOpen}
+              onOk={handleCreateNote}
+              onCancel={handleCancel}
+            >
+              <Input
+                id="title"
+                placeholder="Enter title"
+                value={title}
+                onChange={(x) => setTitle(x.target.value)}
+              />
+            </Modal>
+            {note ? (
+              <Layout>
+                <Header
+                  style={{
+                    padding: "24px",
+                  }}
+                >
+                  <Flex
+                    vertical={true}
+                    wrap="wrap"
+                    style={{
+                      width: "100%",
+                      gap: "5px",
+                    }}
                   >
-                    {" "}
-                    Delete{" "}
-                  </Button>
-                  <Button type="primary"> Save </Button>
-                </Flex>
-              </Flex>
-            </Content>
+                    <Input
+                      id="title"
+                      placeholder="Enter title"
+                      value={title}
+                      onChange={(x) => setTitle(x.target.value)}
+                    />
+                    <Flex
+                      style={{
+                        alignItems: "center",
+                        width: "100%",
+                        height: "32px",
+                        gap: "5px",
+                        overflow: "hidden",
+                        overflowX: "scroll",
+                        scrollbarWidth: "none",
+                      }}
+                    >
+                      <PlusOutlined onClick={handleAddTagToNote} />
+                      {tags
+                        .filter((tag) => applyFiltersOnTag(tag))
+                        .map((tag) => (
+                          <Button
+                            style={{ minWidth: "70px", width: "50px" }}
+                            key={tag.id}
+                          >
+                            {tag.title}
+                          </Button>
+                        ))}
+                    </Flex>
+                    <Modal
+                      title="tags"
+                      open={IsModalAddTagToNoteOpen}
+                      onOk={handleAddTags}
+                      onCancel={handleCancel}
+                    >
+                      {tags.map((tag) => (
+                        <Button
+                          color="red"
+                          variant={
+                            modalSelectedTags.includes(tag.id)
+                              ? "solid"
+                              : "text"
+                          }
+                          key={tag.id}
+                          onClick={() => handleModalSelectTag(tag.id)}
+                        >
+                          {tag.title}
+                        </Button>
+                      ))}
+                    </Modal>
+                  </Flex>
+                </Header>
+
+                <Content
+                  className="content"
+                  style={{
+                    height: "calc(100vh - 120px)",
+                    padding: 24,
+                    overflow: "hidden",
+                  }}
+                >
+                  <Flex style={{ height: "100%" }} gap="5px" vertical={true}>
+                    <Input.TextArea
+                      id="content"
+                      placeholder="Enter Content"
+                      value={content}
+                      style={{ height: "100%" }}
+                      onChange={(x) => setContent(x.target.value)}
+                    />
+                    <Flex gap="5px" justify="end">
+                      <Button
+                        color="danger"
+                        variant="solid"
+                        onClick={handleDeleteNote}
+                      >
+                        {" "}
+                        Delete{" "}
+                      </Button>
+                      <Button type="primary" onClick={() => handleSaveNote(note.id)}> Save </Button>
+                    </Flex>
+                  </Flex>
+                </Content>
+              </Layout>
+            ) : null}
           </Layout>
-        ) : null}
-      </Layout>
+          <Footer>
+            <Flex style={{ gap: "5px" }}>
+              <Button onClick={signOut}> Sign out </Button>
+              <Button
+                icon={isLightTheme ? <MoonOutlined /> : <SunOutlined />}
+                onClick={handleTheme}
+              />
+            </Flex>
+          </Footer>
+        </Layout>
+      </ConfigProvider>
     );
   }
 };
