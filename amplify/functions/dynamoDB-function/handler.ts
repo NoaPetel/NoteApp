@@ -32,7 +32,8 @@ export const handler = async (event: DynamoDBStreamEvent) => {
 
         console.log(typeof(response.UserAttributes));
         const attributesArray = Array.from(response.UserAttributes ?? []);
-        const emailAttribute = attributesArray?.find((attr) => attr.Name === "email");
+        // @ts-ignore
+        const emailAttribute = attributesArray?.find((attr) => attr.Name === "email"); 
         if(!emailAttribute){
           console.error("No email found in the user attributes.")
           continue;
