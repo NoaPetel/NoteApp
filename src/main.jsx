@@ -16,10 +16,12 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
+  <>
+  {/* <React.StrictMode> */}
     <GlobalStyle />
       <Authenticator>
         <App />
       </Authenticator>
-  </React.StrictMode>
+  {/* </React.StrictMode> */}
+  </>
 );

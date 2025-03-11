@@ -5,6 +5,8 @@ import {
   PlusOutlined,
   MoonOutlined,
   SunOutlined,
+  GifOutlined,
+  OpenAIOutlined,
 } from "@ant-design/icons";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import {
@@ -17,6 +19,8 @@ import {
   theme,
   Flex,
   Spin,
+  Card,
+  Image,
 } from "antd";
 import {
   createNote,
@@ -30,25 +34,31 @@ import {
   fetchNotes,
   fetchTags,
   fetchNoteTags,
-  updateNote
+  updateNote,
 } from "./data";
 import themeA from "./themeBuilder.json";
 import themeB from "./themeBuilder2.json";
+import GifSearch from "./components/Gifsearch";
+import summarizeNote from "./services/openaiService";
 
 const App = () => {
   const [notes, setNotes] = useState([]);
   const [tags, setTags] = useState([]);
   const [noteTags, setNoteTags] = useState([]);
+  const [selectedGifs, setSelectedGifs] = useState([]);
   const [sliderNotesItems, setSliderNotesItems] = useState([]);
   const [sliderTagsItems, setSliderTagsItems] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [summary, setSummary] = useState("");
 
   const [isLightTheme, setIsLightTheme] = useState(true);
   const [modalSelectedTags, setModalSelectedTags] = useState([]);
   const [IsModalAddTagToNoteOpen, setIsModalAddTagToNoteOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalGIFOpen, setIsModalGIFOpen] = useState(false);
   const [isModalTagsOpen, setIsModalTagsOpen] = useState(false);
+  const [isModalGPTOpen, setIsModalGPTOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [tagTitle, setTagTitle] = useState("");
@@ -160,9 +170,12 @@ const App = () => {
   };
 
   function handleCancel() {
+    console.log("Cancel");
     setIsModalOpen(false);
     setIsModalAddTagToNoteOpen(false);
     setIsModalTagsOpen(false);
+    setIsModalGIFOpen(false);
+    setIsModalGPTOpen(false);
   }
 
   function handleCreateNote() {
@@ -257,18 +270,35 @@ const App = () => {
   }
 
   function handleTheme() {
-    // console.log("Light", isLightTheme);
-    // setIsLightTheme((prev) => !prev);
     setCurrentTheme((prev) => (prev === themeA ? themeB : themeA));
   }
 
-  function handleSaveNote(noteId){
-    try{
+  function handleSaveNote(noteId) {
+    try {
       updateNote(noteId, title, content);
-    } catch(err) {
+    } catch (err) {
       console.log("Error while updating note", err);
     }
   }
+
+  function handleGifClick() {
+    setIsModalGIFOpen(true);
+  }
+
+  function handleAddGif(gifs) {
+    console.log("gifs", gifs);
+    setSelectedGifs(gifs);
+    setIsModalGIFOpen(false);
+  }
+  const handleGPTClick = async () => {
+    try {
+      const summarizedContent = await summarizeNote(content);
+      setSummary(summarizedContent);
+      setIsModalGPTOpen(true);
+    } catch (error) {
+      console.error("Error summarizing note:", error);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -422,14 +452,36 @@ const App = () => {
                   }}
                 >
                   <Flex style={{ height: "100%" }} gap="5px" vertical={true}>
-                    <Input.TextArea
-                      id="content"
-                      placeholder="Enter Content"
-                      value={content}
-                      style={{ height: "100%" }}
-                      onChange={(x) => setContent(x.target.value)}
-                    />
+                    <Flex
+                      vertical={true}
+                      flex="50 1"
+                      gap="5px"
+                      style={{ overflowY: "auto" }}
+                    >
+                      <Input.TextArea
+                        id="content"
+                        placeholder="Enter Content"
+                        value={content}
+                        style={{ height: "100%" }}
+                        onChange={(x) => setContent(x.target.value)}
+                      />
+                      <Flex wrap>
+                        {selectedGifs.map((gif, index) => (
+                          <Image
+                            key={index}
+                            src={gif.images.fixed_width_small.url}
+                          />
+                        ))}
+                      </Flex>
+                    </Flex>
+
                     <Flex gap="5px" justify="end">
+                      <Button
+                        icon={<OpenAIOutlined />}
+                        onClick={handleGPTClick}
+                      />
+                      <Button onClick={handleGifClick} icon={<GifOutlined />} />
+
                       <Button
                         color="danger"
                         variant="solid"
@@ -438,7 +490,27 @@ const App = () => {
                         {" "}
                         Delete{" "}
                       </Button>
-                      <Button type="primary" onClick={() => handleSaveNote(note.id)}> Save </Button>
+                      <Button
+                        type="primary"
+                        onClick={() => handleSaveNote(note.id)}
+                      >
+                        {" "}
+                        Save{" "}
+                      </Button>
+
+                      <GifSearch
+                        isModalOpen={isModalGIFOpen}
+                        handleCancel={handleCancel}
+                        handleAddGif={handleAddGif}
+                      />
+
+                      <Modal
+                        open={isModalGPTOpen}
+                        onCancel={handleCancel}
+                        onOk={handleCancel}
+                      >
+                        <p> {summary}</p>
+                      </Modal>
                     </Flex>
                   </Flex>
                 </Content>
