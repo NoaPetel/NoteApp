@@ -8,6 +8,7 @@ const logger = new Logger({
 
 import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
 import { CognitoIdentityProvider, AdminGetUserCommand } from "@aws-sdk/client-cognito-identity-provider";
+import { AttributeType } from "aws-cdk-lib/aws-dynamodb";
 
 const sesClient = new SESClient({});
 const cognitoClient = new CognitoIdentityProvider({});
@@ -28,8 +29,10 @@ export const handler = async (event: DynamoDBStreamEvent) => {
         const command = new AdminGetUserCommand(input);
         const response = await cognitoClient.send(command);
         console.log("User", response);
-        
-        const emailAttribute = response.UserAttributes?.find((attr) => attr.Name === "email");
+
+        console.log(typeof(response.UserAttributes));
+        const attributesArray = Array.from(response.UserAttributes ?? []);
+        const emailAttribute = attributesArray?.find((attr) => attr.Name === "email");
         if(!emailAttribute){
           console.error("No email found in the user attributes.")
           continue;

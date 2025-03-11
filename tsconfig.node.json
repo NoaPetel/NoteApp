@@ -16,7 +16,11 @@
   },
   "include": [
     "vite.config.ts",
-    "src",
-    "amplify"
+    "src/**/*.tsx",
+    "src/**/*.jsx",
+    "src/**/*.ts",
+    "src/**/*.json",
+    "amplify/**/*.ts",
+    "amplify_outpouts.json"
   ]
 }
