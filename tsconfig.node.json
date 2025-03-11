@@ -16,9 +16,7 @@
   },
   "include": [
     "vite.config.ts",
-    "src/**/*.tsx",
-    "src/**/*.jsx",
-    "src/**/*.ts",
-    "amplify/**/*.ts"
+    "src",
+    "amplify"
   ]
 }
