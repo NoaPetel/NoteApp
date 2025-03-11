@@ -5,22 +5,7 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "jsx": "react-jsx",
-    "allowJs": true,
-    "resolveJsonModule": true,
-    "declaration": true,
-    "declarationMap": true,
-    "emitDeclarationOnly": false,
-    "outDir": "./dist"
+    "strict": true
   },
-  "include": [
-    "vite.config.ts",
-    "src/**/*.tsx",
-    "src/**/*.jsx",
-    "src/**/*.ts",
-    "src/**/*.json",
-    "amplify/**/*.ts",
-    "amplify_outpouts.json"
-  ]
+  "include": ["vite.config.ts"]
 }

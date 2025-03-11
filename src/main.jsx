@@ -6,8 +6,6 @@ import outputs from "../amplify_outputs.json";
 import { Authenticator } from "@aws-amplify/ui-react";
 import { createGlobalStyle } from "styled-components";
 import "@aws-amplify/ui-react/styles.css";
-import { ConfigProvider } from "antd";
-import theme from "./themeBuilder.json";
 
 Amplify.configure(outputs);
 
@@ -17,7 +15,7 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
+ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <GlobalStyle />
       <Authenticator>
