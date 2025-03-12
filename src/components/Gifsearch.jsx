@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button, Input, Flex, Image, Modal, Card } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
-import { fetchGifs } from "../services/giphyService";
+import { fetchGifs } from "../data";
 
 const GifSearch = ({
   isModalOpen,
@@ -15,8 +15,7 @@ const GifSearch = ({
   const handleSearch = async () => {
     try {
       const results = await fetchGifs(search);
-      setGifs(results);
-      console.log("Gif", results);
+      setGifs(results.data);
     } catch (err) {
       console.error("Error while searching for GIFs", err);
     }
@@ -69,7 +68,7 @@ const GifSearch = ({
                   handleOnClick(gif);
                 }}
               >
-                <Image src={gif.images.fixed_width_small.url} />
+                <Image title={gif.title} src={gif.url} />
               </Card>
             ))}
           </Flex>

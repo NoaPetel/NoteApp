@@ -39,10 +39,8 @@ const policy = new Policy(
       new PolicyStatement({
         effect: Effect.ALLOW,
         actions: ["ses:SendEmail"],
-        resources: [
-          "arn:aws:ses:us-east-1:575108932136:identity/*"
-        ]
-      })
+        resources: ["arn:aws:ses:us-east-1:575108932136:identity/*"],
+      }),
     ],
   }
 );

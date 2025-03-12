@@ -1,39 +1,65 @@
-import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
+import {
+  type ClientSchema,
+  a,
+  defineData,
+  defineFunction,
+} from "@aws-amplify/backend";
+import { addGifs } from "../functions/add-gifs/resource";
+import { defineSummarizeNote} from "../functions/summarize-note/resource";
 
-/*== STEP 1 ===============================================================
-The section below creates a Todo database table with a "content" field. Try
-adding a new "isDone" field as a boolean. The authorization rule below
-specifies that any user authenticated via an API key can "create", "read",
-"update", and "delete" any "Todo" records.
-=========================================================================*/
 const schema = a.schema({
   Note: a
     .model({
       id: a.id().required(),
       title: a.string(),
       content: a.string(),
-      noteTags: a.hasMany('NoteTag', 'noteId'),
+      noteTags: a.hasMany("NoteTag", "noteId"),
       expiration: a.timestamp(),
     })
     .authorization((allow) => [allow.owner()]),
 
-    Tag: a
+  Tag: a
     .model({
       id: a.id().required(),
       title: a.string(),
-      noteTags: a.hasMany('NoteTag', 'tagId'),
+      noteTags: a.hasMany("NoteTag", "tagId"),
     })
     .authorization((allow) => [allow.owner()]),
 
-    NoteTag: a
+  NoteTag: a
     .model({
-
       noteId: a.id(),
       tagId: a.id(),
-      note: a.belongsTo('Note', 'noteId'),
-      tag: a.belongsTo('Tag', 'tagId'),
+      note: a.belongsTo("Note", "noteId"),
+      tag: a.belongsTo("Tag", "tagId"),
     })
-    .authorization((allow) => [allow.owner()])
+    .authorization((allow) => [allow.owner()]),
+
+  SummarizeNoteResponse: a.customType({
+    content: a.string(),
+    executionDuration: a.float(),
+  }),
+
+  AddGifsResponse : a.customType({
+    id: a.string(),
+    url: a.string(),
+    title: a.string()
+  }),
+  
+
+  summarizeNote: a
+    .query()
+    .arguments({ content: a.string() })
+    .returns(a.ref("SummarizeNoteResponse"))
+    .authorization((allow) => [allow.authenticated()])
+    .handler(a.handler.function(defineSummarizeNote)),
+
+  fetchGifs: a
+    .query()
+    .arguments({ query: a.string() })
+    .returns(a.ref("AddGifsResponse").array())
+    .authorization((allow) => [allow.authenticated()])
+    .handler(a.handler.function(addGifs)),
 });
 
 export type Schema = ClientSchema<typeof schema>;
@@ -48,32 +74,3 @@ export const data = defineData({
     },
   },
 });
-
-/*== STEP 2 ===============================================================
-Go to your frontend source code. From your client-side code, generate a
-Data client to make CRUDL requests to your table. (THIS SNIPPET WILL ONLY
-WORK IN THE FRONTEND CODE FILE.)
-
-Using JavaScript or Next.js React Server Components, Middleware, Server 
-Actions or Pages Router? Review how to generate Data clients for those use
-cases: https://docs.amplify.aws/gen2/build-a-backend/data/connect-to-API/
-=========================================================================*/
-
-/*
-"use client"
-import { generateClient } from "aws-amplify/data";
-import type { Schema } from "@/amplify/data/resource";
-
-const client = generateClient<Schema>() // use this Data client for CRUDL requests
-*/
-
-/*== STEP 3 ===============================================================
-Fetch records from the database and use them in your frontend component.
-(THIS SNIPPET WILL ONLY WORK IN THE FRONTEND CODE FILE.)
-=========================================================================*/
-
-/* For example, in a React component, you can use this snippet in your
-  function's RETURN statement */
-// const { data: todos } = await client.models.Todo.list()
-
-// return <ul>{todos.map(todo => <li key={todo.id}>{todo.content}</li>)}</ul>

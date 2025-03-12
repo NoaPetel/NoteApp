@@ -20,6 +20,7 @@ export function subscribeNoteTag(setNoteTags: (notes: any[]) => void) {
     next: (data) => setNoteTags([...data.items]),
   });
 }
+
 export async function fetchNotes() {
   try {
     return await client.models.Note.list();
@@ -32,7 +33,6 @@ export async function fetchNotes() {
 export async function fetchTags() {
   try {
     const tags = await client.models.Tag.list();
-    console.log("Tags", tags);
     return tags;
   } catch (err) {
     console.error("Error while fetching Tags", err);
@@ -51,7 +51,11 @@ export async function fetchNoteTags() {
 
 export async function createNote(title: string, content: string) {
   try {
-    return await client.models.Note.create({ title, content, expiration: Math.floor(Date.now() / 1000) + 60 });
+    return await client.models.Note.create({
+      title,
+      content,
+      expiration: Math.floor(Date.now() / 1000) + 60,
+    });
   } catch (err) {
     console.log("Error while creating note", err);
   }
@@ -65,9 +69,18 @@ export async function deleteNote(noteId: string) {
   }
 }
 
-export async function updateNote(noteId: string, title: string, content: string) {
+export async function updateNote(
+  noteId: string,
+  title: string,
+  content: string
+) {
   try {
-    return await client.models.Note.update({id: noteId, title: title, content: content, expiration: Math.floor(Date.now() / 1000) + 60})
+    return await client.models.Note.update({
+      id: noteId,
+      title: title,
+      content: content,
+      expiration: Math.floor(Date.now() / 1000) + 60,
+    });
   } catch (err) {
     console.log("Error while updating note", err);
   }
@@ -92,9 +105,26 @@ export async function deleteTag(tagId: string) {
 export async function createNoteTag(noteId: string, tagId: string) {
   try {
     const x = await client.models.NoteTag.create({ noteId, tagId });
-    console.log(x);
     return x;
   } catch (err) {
     console.error("Error while creating NoteTag", err);
+  }
+}
+
+export async function getSummary(content: string) {
+  try {
+    const response = await client.queries.summarizeNote({ content: content });
+    return response?.data?.content;
+  } catch (err) {
+    console.error("Error while summarizing note", err);
+  }
+}
+
+export async function fetchGifs(query: string){
+  try {
+    const response = await client.queries.fetchGifs({ query: query });
+    return response;
+  } catch (err) {
+    console.error("Error while fetching GIFs", err);
   }
 }

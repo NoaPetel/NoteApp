@@ -35,11 +35,11 @@ import {
   fetchTags,
   fetchNoteTags,
   updateNote,
+  getSummary,
 } from "./data";
 import themeA from "./themeBuilder.json";
 import themeB from "./themeBuilder2.json";
 import GifSearch from "./components/Gifsearch";
-import summarizeNote from "./services/openaiService";
 
 const App = () => {
   const [notes, setNotes] = useState([]);
@@ -170,7 +170,6 @@ const App = () => {
   };
 
   function handleCancel() {
-    console.log("Cancel");
     setIsModalOpen(false);
     setIsModalAddTagToNoteOpen(false);
     setIsModalTagsOpen(false);
@@ -194,6 +193,7 @@ const App = () => {
           setTitle(title);
           setContent("");
           setIsModalOpen(false);
+          setNote(newNote);
         }
       })
       .catch((err) => console.error("Error while creating the notes", err));
@@ -286,13 +286,12 @@ const App = () => {
   }
 
   function handleAddGif(gifs) {
-    console.log("gifs", gifs);
     setSelectedGifs(gifs);
     setIsModalGIFOpen(false);
   }
   const handleGPTClick = async () => {
     try {
-      const summarizedContent = await summarizeNote(content);
+      const summarizedContent = await getSummary(content);
       setSummary(summarizedContent);
       setIsModalGPTOpen(true);
     } catch (error) {
