@@ -1,5 +1,6 @@
 import type { Schema } from "../../data/resource";
 import { OpenAI } from "openai";
+import { secret } from '@aws-amplify/backend';
 
 export const handler: Schema["summarizeNote"]["functionHandler"] = async (
   event
@@ -7,12 +8,9 @@ export const handler: Schema["summarizeNote"]["functionHandler"] = async (
   const start = performance.now();
 
 
-  const OPENAI_API_KEY =
-    "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";
 
   const openai = new OpenAI({
-    apiKey: OPENAI_API_KEY,
-    dangerouslyAllowBrowser: true,
+    apiKey: process.env.OPENAI_API_KEY,
   });
 
   try {

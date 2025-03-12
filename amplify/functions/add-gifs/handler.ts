@@ -1,7 +1,7 @@
 import { startTransition } from "react";
 import type { Schema } from "../../data/resource";
+import { secret } from '@aws-amplify/backend';
 
-const GIPHY_API_KEY = "zHw8IpC7CFf6K7pj27cW0FfbSqEqFgKY";
 const GIPHY_SEARCH_URL = "https://api.giphy.com/v1/gifs/search";
 
 export const handler: Schema["fetchGifs"]["functionHandler"] = async (
@@ -10,7 +10,7 @@ export const handler: Schema["fetchGifs"]["functionHandler"] = async (
   try {
     const start = performance.now();
     const response = await fetch(
-      `${GIPHY_SEARCH_URL}?api_key=${GIPHY_API_KEY}&q=${event.arguments.query}&limit=10`
+      `${GIPHY_SEARCH_URL}?api_key=${process.env.GIPHY_API_KEY}&q=${event.arguments.query}&limit=10`
     );
 
     if (!response.ok) {
