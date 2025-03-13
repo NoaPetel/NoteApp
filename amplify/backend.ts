@@ -40,9 +40,9 @@ const lambdaIntegration = new LambdaIntegration(
   backend.myApiFunction.resources.lambda
 );
 
-const itemsPath = myRestApi.root.addResource("items", {
+const itemsPath = myRestApi.root.addResource("notes", {
   defaultMethodOptions: {
-    authorizationType: AuthorizationType.IAM,
+    authorizationType: AuthorizationType.NONE,
   },
 });
 
@@ -56,42 +56,29 @@ itemsPath.addProxy({
   defaultIntegration: lambdaIntegration,
 });
 
-const cognitoAuth = new CognitoUserPoolsAuthorizer(apiStack, "CognitoAuth", {
-  cognitoUserPools: [backend.auth.resources.userPool],
-});
 
-const booksPath = myRestApi.root.addResource("cognito-auth-path");
-booksPath.addMethod("GET", lambdaIntegration, {
-  authorizationType: AuthorizationType.COGNITO,
-  authorizer: cognitoAuth,
-});
 
 const apiRestPolicy = new Policy(apiStack, "RestApiPolicy", {
   statements: [
     new PolicyStatement({
       actions: ["execute-api:Invoke"],
       resources: [
-        `${myRestApi.arnForExecuteApi("*", "/items", "dev")}`,
-        `${myRestApi.arnForExecuteApi("*", "/items/*", "dev")}`,
-        `${myRestApi.arnForExecuteApi("*", "/cognito-auth-path", "dev")}`,
+        `${myRestApi.arnForExecuteApi("*", "/notes", "dev")}`,
+        `${myRestApi.arnForExecuteApi("*", "/notes/*", "dev")}`,
       ],
     }),
     new PolicyStatement({
       effect: Effect.ALLOW,
-      actions: [
-        "dynamodb:Scan"
+      actions: ["dynamodb:Scan"],
+      resources: [
+        "*",
+        "arn:aws:dynamodb:us-east-1:575108932136:table/Note-pqrdo5giangjlmyusxk2as64hm-NONE",
       ],
-      resources: ["*"],
     }),
   ],
 });
 
-backend.auth.resources.authenticatedUserIamRole.attachInlinePolicy(
-  apiRestPolicy
-);
-backend.auth.resources.unauthenticatedUserIamRole.attachInlinePolicy(
-  apiRestPolicy
-);
+backend.myApiFunction.resources.lambda.role?.attachInlinePolicy(apiRestPolicy);
 
 backend.addOutput({
   custom: {
@@ -99,7 +86,7 @@ backend.addOutput({
       [myRestApi.restApiName]: {
         endpoint: myRestApi.url,
         region: Stack.of(myRestApi).region,
-        apiName: myRestApi.restApiName,
+        apiName: "noteapinouvelle",
       },
     },
   },
@@ -152,4 +139,3 @@ const mapping = new EventSourceMapping(
 );
 
 mapping.node.addDependency(policy);
-
