@@ -24,7 +24,7 @@ const backend = defineBackend({
 // API -------------------------------------------------------------------
 const apiStack = backend.createStack("api-stack");
 const myRestApi = new RestApi(apiStack, "RestApi", {
-  restApiName: "myRestApi",
+  restApiName: "NoteAppAPI",
   deploy: true,
   deployOptions: {
     stageName: "dev",
