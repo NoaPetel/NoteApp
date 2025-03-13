@@ -5,6 +5,8 @@ import { Amplify } from "aws-amplify";
 import outputs from "../amplify_outputs.json";
 import { Authenticator } from "@aws-amplify/ui-react";
 import { createGlobalStyle } from "styled-components";
+import { parseAmplifyConfig } from "aws-amplify/utils";
+
 import "@aws-amplify/ui-react/styles.css";
 
 const amplifyConfig = parseAmplifyConfig(outputs);

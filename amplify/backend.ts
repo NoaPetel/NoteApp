@@ -13,7 +13,6 @@ import {
   LambdaIntegration,
   RestApi,
 } from "aws-cdk-lib/aws-apigateway";
-import { Lambda } from "aws-sdk";
 
 const backend = defineBackend({
   auth,
@@ -76,6 +75,13 @@ const apiRestPolicy = new Policy(apiStack, "RestApiPolicy", {
         `${myRestApi.arnForExecuteApi("*", "/items/*", "dev")}`,
         `${myRestApi.arnForExecuteApi("*", "/cognito-auth-path", "dev")}`,
       ],
+    }),
+    new PolicyStatement({
+      effect: Effect.ALLOW,
+      actions: [
+        "dynamodb:Scan"
+      ],
+      resources: ["*"],
     }),
   ],
 });
@@ -146,3 +152,4 @@ const mapping = new EventSourceMapping(
 );
 
 mapping.node.addDependency(policy);
+
