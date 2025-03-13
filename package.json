@@ -14,7 +14,7 @@
     "@aws-sdk/client-cognito-identity-provider": "^3.760.0",
     "@aws-sdk/client-ses": "^3.758.0",
     "antd": "^5.24.2",
-    "aws-amplify": "^6.6.6",
+    "aws-amplify": "^6.13.4",
     "aws-sdk": "^2.1692.0",
     "openai": "^4.86.2",
     "react": "^18.2.0",

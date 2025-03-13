@@ -12,7 +12,7 @@ export const handler: Schema["summarizeNote"]["functionHandler"] = async (
   const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
   });
-
+  console.log("API", process.env.OPENAI_API_KEY);
   try {
     const response = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
