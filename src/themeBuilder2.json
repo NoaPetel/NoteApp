@@ -1,10 +1,10 @@
 {
   "token": {
-    "colorPrimary": "#4096ff",
+    "colorPrimary": "#2E6F40",
     "sizeStep": 4,
-    "colorBgBase": "#121212",
-    "colorTextBase": "#e0e0e0",
-    "colorBorder": "#333333",
+    "colorBgBase": "#141414",
+    "colorTextBase": "#CFFFDC",
+    "colorBorder": "#2E6F40",
     "colorBgElevated": "#1e1e1e"
   },
   "components": {
@@ -13,23 +13,36 @@
       "footerPadding": "5px 5px",
       "headerBg": "#1a1a1a",
       "siderBg": "#1a1a1a",
-      "colorText": "#e0e0e0"
+      "colorText": "#CFFFDC"
+    },
+    "Menu": {
+      "itemBg": "#1a1a1a",
+      "itemSelectedBg": "#2E6F40",
+      "itemSelectedColor": "#CFFFDC",
+      "itemHoverBg": "#2E6F40",
+      "itemHoverColor": "#CFFFDC",
+      "subMenuItemSelectedColor": "#CFFFDC"
     },
     "Button": {
-      "colorBg": "#262626",
-      "colorBgHover": "#333333",
-      "colorText": "#ffffff"
+      "colorPrimary": "#2E6F40",
+      "colorPrimaryHover": "#CFFFDC",
+      "colorPrimaryActive": "#CFFFDC",
+      "colorText": "#CFFFDC",
+      "colorBgHover": "#CFFFDC",
+      "primaryShadow": "none",
+      "dangerShadow": "none",
+      "defaultShadow": "none"
     },
     "Input": {
       "colorBg": "#262626",
       "colorText": "#ffffff",
-      "colorBorder": "#444444",
-      "colorBorderHover": "#4096ff"
+      "colorBorder": "#2E6F40",
+      "colorBorderHover": "#CFFFDC"
     },
     "Card": {
       "colorBg": "#1e1e1e",
-      "colorBorder": "#333333",
-      "colorShadow": "rgba(0, 0, 0, 0.6)"
+      "colorBorder": "#2E6F40",
+      "colorShadow": "rgba(46, 111, 64, 0.4)"
     }
   }
 }

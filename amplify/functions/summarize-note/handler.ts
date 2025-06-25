@@ -1,13 +1,10 @@
 import type { Schema } from "../../data/resource";
 import { OpenAI } from "openai";
-import { secret } from '@aws-amplify/backend';
 
 export const handler: Schema["summarizeNote"]["functionHandler"] = async (
   event
 ) => {
   const start = performance.now();
-
-
 
   const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,

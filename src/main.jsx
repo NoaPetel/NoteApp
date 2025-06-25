@@ -6,6 +6,7 @@ import outputs from "../amplify_outputs.json";
 import { Authenticator } from "@aws-amplify/ui-react";
 import { createGlobalStyle } from "styled-components";
 import { parseAmplifyConfig } from "aws-amplify/utils";
+import { Flex } from "antd";
 
 import "@aws-amplify/ui-react/styles.css";
 
@@ -27,11 +28,18 @@ const GlobalStyle = createGlobalStyle`
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <>
-    {/* <React.StrictMode> */}
-    <GlobalStyle />
-    <Authenticator>
-      <App />
-    </Authenticator>
-    {/* </React.StrictMode> */}
+    <React.StrictMode>
+      <GlobalStyle />
+
+      <Flex
+        justify="center"
+        align="center"
+        style={{ height: "100vh"}}
+      >
+        <Authenticator>
+          <App />
+        </Authenticator>
+      </Flex>
+    </React.StrictMode>
   </>
 );

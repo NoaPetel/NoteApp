@@ -8,6 +8,7 @@ const GifSearch = ({
   handleCancel,
   handleAddGif,
 }) => {
+
   const [search, setSearch] = useState("");
   const [gifs, setGifs] = useState([]);
   const [selectedGifs, setSelectedGifs] = useState([]);

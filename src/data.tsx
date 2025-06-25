@@ -51,11 +51,13 @@ export async function fetchNoteTags() {
 
 export async function createNote(title: string, content: string) {
   try {
-    return await client.models.Note.create({
+    const res = await client.models.Note.create({
       title,
       content,
       expiration: Math.floor(Date.now() / 1000) + 60,
     });
+    console.log("CreateNote", res);
+    return res;
   } catch (err) {
     console.log("Error while creating note", err);
   }
@@ -96,7 +98,12 @@ export async function createTag(tagTitle: string) {
 
 export async function deleteTag(tagId: string) {
   try {
-    return await client.models.Tag.delete({ id: tagId });
+    const response = await client.models.Tag.delete({ id: tagId });
+    const noteTags = await client.models.NoteTag.list({ filter: { tagId: { eq: tagId } } });
+    for (const noteTag of noteTags.data) {
+      await client.models.NoteTag.delete({ id: noteTag.id });
+    }
+    return response;
   } catch (err) {
     console.log("Error while deleting Tag", err);
   }
@@ -104,8 +111,7 @@ export async function deleteTag(tagId: string) {
 
 export async function createNoteTag(noteId: string, tagId: string) {
   try {
-    const x = await client.models.NoteTag.create({ noteId, tagId });
-    return x;
+    return await client.models.NoteTag.create({ noteId, tagId });
   } catch (err) {
     console.error("Error while creating NoteTag", err);
   }
@@ -120,7 +126,7 @@ export async function getSummary(content: string) {
   }
 }
 
-export async function fetchGifs(query: string){
+export async function fetchGifs(query: string) {
   try {
     const response = await client.queries.fetchGifs({ query: query });
     return response;
@@ -128,3 +134,4 @@ export async function fetchGifs(query: string){
     console.error("Error while fetching GIFs", err);
   }
 }
+

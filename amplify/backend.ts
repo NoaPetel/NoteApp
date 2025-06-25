@@ -86,7 +86,7 @@ backend.addOutput({
       [myRestApi.restApiName]: {
         endpoint: myRestApi.url,
         region: Stack.of(myRestApi).region,
-        apiName: "noteapinouvelle",
+        apiName: myRestApi.restApiName,
       },
     },
   },
