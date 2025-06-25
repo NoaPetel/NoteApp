@@ -1,55 +1,37 @@
 import React, { useEffect, useState } from "react";
 import {
-  AlignCenterOutlined,
-  TagOutlined,
   PlusOutlined,
   MoonOutlined,
   SunOutlined,
-  CloseOutlined,
 } from "@ant-design/icons";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import {
   Button,
-  Modal,
-  Input,
   Layout,
-  Menu,
   ConfigProvider,
   Flex,
   Spin,
-  Typography,
 } from "antd";
 import {
-  createNote,
-  createTag,
   subscribeNote,
   subscribeTag,
   subscribeNoteTag,
   fetchNotes,
   fetchTags,
   fetchNoteTags,
-  deleteTag,
 } from "./data";
 import NoteContent from "@/components/note-content/NoteContent";
 import themeA from "./themeBuilder.json";
 import themeB from "./themeBuilder2.json";
 import MenuTags from "./components/MenuTags";
-
-const { Text } = Typography;
+import MenuNotes from "./components/MenuNotes";
 
 const App = () => {
   const [notes, setNotes] = useState([]);
   const [tags, setTags] = useState([]);
   const [noteTags, setNoteTags] = useState([]);
-  const [sliderNotesItems, setSliderNotesItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const [isModalTagsOpen, setIsModalTagsOpen] = useState(false);
-
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [tagTitle, setTagTitle] = useState("");
+  const [sliderNotesItems, setSliderNotesItems] = useState([]);
   const [note, setNote] = useState(null);
 
   const [currentTheme, setCurrentTheme] = useState(themeA);
@@ -99,51 +81,6 @@ const App = () => {
     fetchInitialData();
   }, []);
 
-  
-  const handleNoteClick = (item) => {
-    if (item.key === "ADD") {
-      setIsModalOpen(true);
-    } else {
-      const clickedNote = notes.find((n) => n.id === item.key);
-      if (clickedNote) {
-        setNote(clickedNote);
-        setTitle(clickedNote?.title || "");
-        setContent(clickedNote?.content || "");
-      }
-    }
-  };
-
-  
-
-  function handleCancel() {
-    setIsModalOpen(false);
-    setIsModalTagsOpen(false);
-  }
-
-  function handleCreateNote() {
-    createNote(title, content)
-      .then((response) => {
-        if (response.data) {
-          const newNote = response.data;
-          setSliderNotesItems((prevValue) => [
-            {
-              key: newNote.id,
-              label: newNote.title,
-            },
-            ...prevValue,
-          ]);
-
-          setTitle(title);
-          setContent("");
-          setIsModalOpen(false);
-          setNote(newNote);
-        }
-      })
-      .catch((err) => console.error("Error while creating the notes", err));
-  }
-
-  
-
   function handleTheme() {
     setCurrentTheme((prev) => (prev === themeA ? themeB : themeA));
   }
@@ -178,27 +115,8 @@ const App = () => {
                 height: "100%",
               }}
             >
-              <Menu
-                mode="inline"
-                style={{ height: "100%" }}
-                defaultSelectedKeys={["1"]}
-                items={sliderNotesItems}
-                onClick={handleNoteClick}
-              />
+              <MenuNotes notes={notes} setNote={setNote} sliderNotesItems={sliderNotesItems} setSliderNotesItems={setSliderNotesItems} />
             </Sider>
-            <Modal
-              title="Note"
-              open={isModalOpen}
-              onOk={handleCreateNote}
-              onCancel={handleCancel}
-            >
-              <Input
-                id="title"
-                placeholder="Enter title"
-                value={title}
-                onChange={(x) => setTitle(x.target.value)}
-              />
-            </Modal>
 
             <NoteContent
               note={note}
@@ -206,7 +124,9 @@ const App = () => {
               noteTags={noteTags}
               setSliderNotesItems={setSliderNotesItems}
             />
+
           </Layout>
+
           <Footer>
             <Flex style={{ gap: "5px" }}>
               <Button onClick={signOut}> Sign out </Button>
@@ -218,6 +138,7 @@ const App = () => {
               />
             </Flex>
           </Footer>
+
         </Layout>
       </ConfigProvider>
     );
