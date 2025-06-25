@@ -109,16 +109,18 @@ const NoteHeader = ({ note, tags = [], noteTags = [] }) => {
           onOk={handleAddTags}
           onCancel={handleCancel}
         >
-          {tags.map((tag) => (
-            <Button
-              color="red"
-              variant={modalSelectedTags.includes(tag.id) ? "solid" : "text"}
-              key={tag.id}
-              onClick={() => handleModalSelectTag(tag.id)}
-            >
-              {tag.title}
-            </Button>
-          ))}
+          <Flex gap="small">
+            {tags.map((tag) => (
+              <Button
+                color="red"
+                variant={modalSelectedTags.includes(tag.id) ? "solid" : "text"}
+                key={tag.id}
+                onClick={() => handleModalSelectTag(tag.id)}
+              >
+                {tag.title}
+              </Button>
+            ))}
+          </Flex>
         </Modal>
       </Flex>
     </Header>

@@ -59,7 +59,7 @@ const App = () => {
         setSliderNotesItems([
           ...fetchedNotes.data.map((note) => ({
             key: note.id,
-            label: note.title,
+            label: note.title,  
           })),
           {
             key: "ADD",
@@ -122,6 +122,7 @@ const App = () => {
               note={note}
               tags={tags}
               noteTags={noteTags}
+              setNote={setNote}
               setSliderNotesItems={setSliderNotesItems}
             />
 

@@ -6,7 +6,7 @@ import { GifOutlined, OpenAIOutlined } from "@ant-design/icons";
 
 const { Content } = Layout;
 
-const NoteBody = ({ note, setSliderNotesItems }) => {
+const NoteBody = ({ note, setNote,setSliderNotesItems }) => {
 
   const [content, setContent] = useState(note?.content);
   const [selectedGifs, setSelectedGifs] = useState([]);
@@ -42,6 +42,7 @@ const NoteBody = ({ note, setSliderNotesItems }) => {
   function handleDeleteNote() {
     if (note) {
       setSliderNotesItems((prev) => prev?.filter((n) => n?.key !== note.id));
+      setNote(null);
       deleteNote(note.id);
     }
   }
