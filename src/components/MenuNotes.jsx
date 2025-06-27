@@ -5,8 +5,9 @@ import { createNote } from "@/data";
 const MenuNotes = ({ notes, setNote, sliderNotesItems, setSliderNotesItems }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [title, setTitle] = useState("");
-    const [content, setContent] = useState("");
     
+    const [modalTitle, setModalTitle] = useState("");
+
     const handleNoteClick = (item) => {
         if (item.key === "ADD") {
             setIsModalOpen(true);
@@ -15,18 +16,16 @@ const MenuNotes = ({ notes, setNote, sliderNotesItems, setSliderNotesItems }) =>
             if (clickedNote) {
                 setNote(clickedNote);
                 setTitle(clickedNote?.title || "");
-                setContent(clickedNote?.content || "");
             }
         }
     };
 
     function handleCancel() {
         setIsModalOpen(false);
-        setIsModalTagsOpen(false);
     }
 
     function handleCreateNote() {
-        createNote(title, content)
+        createNote(modalTitle)
             .then((response) => {
                 if (response.data) {
                     const newNote = response.data;
@@ -38,8 +37,8 @@ const MenuNotes = ({ notes, setNote, sliderNotesItems, setSliderNotesItems }) =>
                         ...prevValue,
                     ]);
 
-                    setTitle(title);
-                    setContent("");
+                    setTitle(modalTitle);
+                    setModalTitle("");
                     setIsModalOpen(false);
                     setNote(newNote);
                 }
@@ -66,8 +65,8 @@ const MenuNotes = ({ notes, setNote, sliderNotesItems, setSliderNotesItems }) =>
                 <Input
                     id="title"
                     placeholder="Enter title"
-                    value={title}
-                    onChange={(x) => setTitle(x.target.value)}
+                    value={modalTitle}
+                    onChange={(x) => setModalTitle(x.target.value)}
                 />
             </Modal>
         </>

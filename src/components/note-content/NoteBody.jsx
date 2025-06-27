@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { deleteNote, updateNote, getSummary } from "../../data";
-import { Layout, Flex, Input, Modal, Button, Popover } from "antd";
+import { Layout, Flex, Input, Modal, Button, Popover, message } from "antd";
 import GifSearch from "../Gifsearch";
 import { GifOutlined, OpenAIOutlined } from "@ant-design/icons";
 
 const { Content } = Layout;
 
-const NoteBody = ({ note, setNote,setSliderNotesItems }) => {
+const NoteBody = ({ note, setNote, setSliderNotesItems }) => {
+
+  const [messageApi, contextHolder] = message.useMessage();
 
   const [content, setContent] = useState(note?.content);
   const [selectedGifs, setSelectedGifs] = useState([]);
@@ -47,9 +49,14 @@ const NoteBody = ({ note, setNote,setSliderNotesItems }) => {
     }
   }
 
-  function handleSaveNote(noteId) {
+  async function handleSaveNote(noteId) {
     try {
-      updateNote(noteId, note.title, content);
+      const response = await updateNote(noteId, note.title, content);
+      if (response.data) {
+        message.success("Note updated successfully");
+      } else {
+        message.error("Failed to update note");
+      }
     } catch (err) {
       console.log("Error while updating note", err);
     }
