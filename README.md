@@ -1,25 +1,93 @@
-## AWS Amplify React+Vite Starter Template
+# **[📝 NoteApp](#)**
 
-This repository provides a starter template for creating applications using React+Vite and AWS Amplify, emphasizing easy setup for authentication, API, and database capabilities.
+![Release](https://img.shields.io/badge/Release-v1.0-blueviolet)
+![Language](https://img.shields.io/badge/Language-JavaScript-yellow)
+![Frameworks](https://img.shields.io/badge/Frameworks-React-61dafb)
+![Size](https://img.shields.io/badge/Size-~5MB-green)
 
-## Overview
 
-This template equips you with a foundational React application integrated with AWS Amplify, streamlined for scalability and performance. It is ideal for developers looking to jumpstart their project with pre-configured AWS services like Cognito, AppSync, and DynamoDB.
+<br/>
 
-## Features
+*⚠️ This project was created as a learning exercise for an internship to build a note-taking app using React and Vite. I decided to leave it as-is when I stopped working on it ⚠️*
 
-- **Authentication**: Setup with Amazon Cognito for secure user authentication.
-- **API**: Ready-to-use GraphQL endpoint with AWS AppSync.
-- **Database**: Real-time database powered by Amazon DynamoDB.
+<br/>
 
-## Deploying to AWS
+NoteApp is a **simple and modern note-taking application** that lets users create, edit, and search notes quickly. It features a clean UI and leverages React for a smooth interactive experience.
 
-For detailed instructions on deploying your application, refer to the [deployment section](https://docs.amplify.aws/react/start/quickstart/#deploy-a-fullstack-app-to-aws) of our documentation.
+<br/>
 
-## Security
+<p align="center">
+  <img src="./thumbnail.png" width="500" alt="NoteApp demo">
+</p>
 
-See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
+<br/>
 
-## License
+# 📋 Summary
 
-This library is licensed under the MIT-0 License. See the LICENSE file.
+* **[📋 Summary](#-summary)**
+* **[📝 Features](#-features)**
+* **[🛠️ Install](#%EF%B8%8F-install)**
+  * [📦 Dependencies](#-dependencies)
+  * [⚙️ Setup](#%EF%B8%8F-setup)
+  * [🚀 Run](#-run)
+* **[🙏 Credits](#-credits)**
+
+---
+
+## 📝 Features
+
+- Create, edit, and delete notes
+- Adding tags
+- Summarize note using OpenAI API
+- Add gifs using Giphy API
+
+
+---
+
+## 🛠️ Install
+
+### 📦 Dependencies
+
+- npm
+- React
+- Vite
+- Amplify
+- Antd
+
+### ⚙️ Setup
+
+- Add ```.env``` file with : 
+
+
+```bash
+OPENAI_API_KEY = <api_key>
+GIPHY_API_KEY = <api_key>
+```
+- Then run the following command :
+
+```bash
+npm install
+npm build
+```
+
+### 🚀 Run
+
+#### Default :
+```bash
+npm run start
+```
+#### Dev :
+```bash
+npm run dev
+```
+
+#### Server :
+```bash
+npm run fstart
+```
+(Stop the server with ```npm run fstop```)
+
+### 🙏 Credits
+- Developed by Noa Petel
+
+
