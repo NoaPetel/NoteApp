@@ -56,7 +56,6 @@ export async function createNote(title: string) {
       content: "",
       expiration: Math.floor(Date.now() / 1000) + 60,
     });
-    console.log("CreateNote", res);
     return res;
   } catch (err) {
     console.log("Error while creating note", err);
@@ -120,7 +119,6 @@ export async function createNoteTag(noteId: string, tagId: string) {
 export async function getSummary(content: string) {
   try {
     const response = await client.queries.summarizeNote({ content: content });
-    console.log("Response", response);
     return response?.data?.content;
   } catch (err) {
     console.error("Error while summarizing note", err);

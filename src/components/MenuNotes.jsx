@@ -4,8 +4,7 @@ import { createNote } from "@/data";
 
 const MenuNotes = ({ notes, setNote, sliderNotesItems, setSliderNotesItems }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [title, setTitle] = useState("");
-    
+    const [selectedNote, setSelectedNote] = useState(null);
     const [modalTitle, setModalTitle] = useState("");
 
     const handleNoteClick = (item) => {
@@ -15,7 +14,7 @@ const MenuNotes = ({ notes, setNote, sliderNotesItems, setSliderNotesItems }) =>
             const clickedNote = notes.find((n) => n.id === item.key);
             if (clickedNote) {
                 setNote(clickedNote);
-                setTitle(clickedNote?.title || "");
+                setSelectedNote(clickedNote);
             }
         }
     };
@@ -37,10 +36,10 @@ const MenuNotes = ({ notes, setNote, sliderNotesItems, setSliderNotesItems }) =>
                         ...prevValue,
                     ]);
 
-                    setTitle(modalTitle);
                     setModalTitle("");
                     setIsModalOpen(false);
                     setNote(newNote);
+                    setSelectedNote(newNote);
                 }
             })
             .catch((err) => console.error("Error while creating the notes", err));
@@ -53,6 +52,7 @@ const MenuNotes = ({ notes, setNote, sliderNotesItems, setSliderNotesItems }) =>
                 mode="inline"
                 style={{ height: "100%" }}
                 defaultSelectedKeys={["1"]}
+                selectedKeys={selectedNote ? [selectedNote.id] : []}
                 items={sliderNotesItems}
                 onClick={handleNoteClick}
             />
