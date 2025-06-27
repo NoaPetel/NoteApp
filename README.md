@@ -14,6 +14,7 @@
 
 NoteApp is a **simple and modern note-taking application** that lets users create, edit, and search notes quickly. It features a clean UI and leverages React for a smooth interactive experience.
 
+You can test it here : <a>https://main.d3q237t2jj391o.amplifyapp.com/</a>
 <br/>
 
 <p align="center">
