@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { deleteNote, updateNote, getSummary } from "../../data";
 import { Layout, Flex, Input, Modal, Button, Popover } from "antd";
-import GifSearch from "@/components/GifSearch";
+import GifSearch from "../Gifsearch";
 import { GifOutlined, OpenAIOutlined } from "@ant-design/icons";
 
 const { Content } = Layout;
